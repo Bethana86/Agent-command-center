@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TCS Agent Command Center - Enterprise AI Governance Hub</title>
+  <!-- Google Fonts & Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js CDN for FinOps and Performance charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header with Persona Switcher and Gateway Status -->
+    <header>
+      <div class="logo-container">
+        <div class="logo-icon">
+          <!-- Shield/Control plane SVG -->
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1>TCS Agent Command Center</h1>
+          <p>Enterprise AI Governance Hub</p>
+        </div>
+      </div>
+      
+      <!-- Persona Navigation Switcher -->
+      <nav class="persona-nav">
+        <button class="persona-btn active" onclick="switchPersona('lifecycle')" data-persona="lifecycle" id="btn-lifecycle">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Agent Lifecycle Trace
+        </button>
+        <button class="persona-btn" onclick="switchPersona('risk')" data-persona="risk" id="btn-risk">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+          Risk & Compliance
+        </button>
+        <button class="persona-btn" onclick="switchPersona('cost')" data-persona="cost" id="btn-cost">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Cost Tracing & Monitoring
+        </button>
+        <button class="persona-btn" onclick="switchPersona('platform')" data-persona="platform" id="btn-platform">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+          Platform Administrator
+        </button>
+      </nav>
+
+      <div class="header-status">
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span>TCS Gateway Active</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- PoV Hero Section -->
+      <section class="hero-section">
+        <div class="hero-content">
+          <div class="hero-tag">Decoupled Architecture</div>
+          <h2>Separation of Concerns: Governance Without Execution</h2>
+          <p>
+            Decouple policy enforcement from model performance. The TCS Agent Command Center acts as an invisible orchestrator—defining who, what, and under which parameters workloads can execute—without path-interfering or introducing latency to high-performance client queries.
+          </p>
+          <div class="hero-actions">
+            <button class="btn-primary" id="btn-simulate-workload">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Trigger Live Simulation
+            </button>
+            <button class="btn-secondary" id="btn-toggle-sim-speed">Speed: 1x</button>
+          </div>
+        </div>
+        
+        <!-- Live Counters -->
+        <div class="hero-stats">
+          <div class="stat-card">
+            <div class="stat-value glow-indigo" id="val-latency">&lt; 1.5ms</div>
+            <div class="stat-label">Gateway Overhead</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value glow-emerald" id="val-enforcement">100%</div>
+            <div class="stat-label">Enforcement Rate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value glow-amber" id="val-fleet">18</div>
+            <div class="stat-label">Registered Fleet</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value glow-rose" id="val-violations">0</div>
+            <div class="stat-label">Violations Blocked</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- The Six Pillars Control Plane Lanes Visualizer -->
+      <section class="visualizer-card">
+        <div class="visualizer-header">
+          <div class="visualizer-info">
+            <h3>The Six Pillars of AI Enablement</h3>
+            <p>Trace how workloads pass through autonomous auditing lanes at the Gateway in real-time.</p>
+          </div>
+          <div class="visualizer-controls">
+            <span class="badge badge-info">Ingress Packet Feed</span>
+          </div>
+        </div>
+        
+        <div class="lanes-container">
+          <div class="lane-axis"></div>
+          
+          <!-- Lane 1: Identity & Access -->
+          <div class="lane" style="--lane-color: var(--color-identity);">
+            <div class="lane-meta">
+              <span class="lane-title">Identity & Access</span>
+              <span class="lane-sub">TCS Tenant Gateway Auth</span>
+            </div>
+            <div class="lane-path" id="lane-path-identity"></div>
+            <div class="lane-endpoint">
+              <span class="endpoint-badge idle" id="badge-identity">IAM OK</span>
+            </div>
+          </div>
+
+          <!-- Lane 2: Policy Enforcement -->
+          <div class="lane" style="--lane-color: var(--color-policy);">
+            <div class="lane-meta">
+              <span class="lane-title">Policy Enforcement</span>
+              <span class="lane-sub">Model Armor Filters</span>
+            </div>
+            <div class="lane-path" id="lane-path-policy"></div>
+            <div class="lane-endpoint">
+              <span class="endpoint-badge idle" id="badge-policy">SHIELD UP</span>
+            </div>
+          </div>
+
+          <!-- Lane 3: Registration -->
+          <div class="lane" style="--lane-color: var(--color-registry);">
+            <div class="lane-meta">
+              <span class="lane-title">Registration</span>
+              <span class="lane-sub">Model & Tool Binding</span>
+            </div>
+            <div class="lane-path" id="lane-path-registry"></div>
+            <div class="lane-endpoint">
+              <span class="endpoint-badge idle" id="badge-registry">REGISTRY OK</span>
+            </div>
+          </div>
+
+          <!-- Lane 4: Observability -->
+          <div class="lane" style="--lane-color: var(--color-observability);">
+            <div class="lane-meta">
+              <span class="lane-title">Observability</span>
+              <span class="lane-sub">Compliance Policy Auditor</span>
+            </div>
+            <div class="lane-path" id="lane-path-observability"></div>
+            <div class="lane-endpoint">
+              <span class="endpoint-badge idle" id="badge-observability">AUDIT LOGGED</span>
+            </div>
+          </div>
+
+          <!-- Lane 5: Cost Controls -->
+          <div class="lane" style="--lane-color: var(--color-cost);">
+            <div class="lane-meta">
+              <span class="lane-title">Cost Controls</span>
+              <span class="lane-sub">Gateway Token Limiter</span>
+            </div>
+            <div class="lane-path" id="lane-path-cost"></div>
+            <div class="lane-endpoint">
+              <span class="endpoint-badge idle" id="badge-cost">BUDGET SAFE</span>
+            </div>
+          </div>
+
+          <!-- Lane 6: Runtime Intervention -->
+          <div class="lane" style="--lane-color: var(--color-intervention);">
+            <div class="lane-meta">
+              <span class="lane-title">Runtime Intervention</span>
+              <span class="lane-sub">Session Control Interceptor</span>
+            </div>
+            <div class="lane-path" id="lane-path-intervention"></div>
+            <div class="lane-endpoint">
+              <span class="endpoint-badge idle" id="badge-intervention">INTERCEPT ON</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard Persona Switcher Panel Container -->
+      <section class="dashboard-grid">
+        <!-- Left Side: Interactive Tools (Swaps dynamically) -->
+        <div class="column-left">
+          
+          <!-- PERSONA 1: AGENT LIFECYCLE TRACE -->
+          <div class="persona-panel active" id="panel-lifecycle">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                  </svg>
+                  Agentic Lifecycle Execution Trace & Monitoring
+                </h3>
+                <span class="badge badge-info">Trace & Monitor</span>
+              </div>
+              <div class="sandbox-editor" style="gap: 16px;">
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: flex-end;">
+                  <div class="editor-field">
+                    <label class="editor-label">Select Agent Instance to Monitor</label>
+                    <select id="trace-agent-select" onchange="loadLifecycleAgent()">
+                      <option value="fin-analyzer" selected>Financial Report Analyzer (fin-analyzer)</option>
+                      <option value="hr-assistant">HR Employee Assistant (hr-assistant)</option>
+                      <option value="code-copilot">Dev Sandbox Copilot (code-copilot)</option>
+                    </select>
+                  </div>
+                  <button class="btn-primary" id="btn-run-trace" onclick="triggerLifecycleTrace()" style="padding: 10px 14px; font-size: 0.85rem; height: 42px; width: 100%;">
+                    Run Trace Steps
+                  </button>
+                </div>
+
+                <!-- Trace Timeline Visualizer -->
+                <div class="timeline-container" id="timeline-trace-list">
+                  <!-- Steps populated dynamically via JS -->
+                </div>
+              </div>
+            </div>
+
+            <!-- New Section: Enterprise Observability & Intelligence Hub -->
+            <div class="card" style="margin-top: 16px;">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
+                  </svg>
+                  Enterprise Observability Hub (RAG & Tool Metrics)
+                </h3>
+                <span class="badge badge-success">Telemetry Logs</span>
+              </div>
+              
+              <div class="obs-metrics-grid">
+                <div class="dial-card" style="border-top: 3px solid var(--accent-success);">
+                  <span class="dial-label" style="font-size: 0.65rem;">Task Success Rate</span>
+                  <div class="dial-value" id="val-obs-success" style="font-size: 1.25rem; margin-top: 4px;">94.8%</div>
+                  <span style="font-size: 0.6rem; color: var(--text-muted);">950 successful runs</span>
+                </div>
+                <div class="dial-card" style="border-top: 3px solid var(--accent-primary);">
+                  <span class="dial-label" style="font-size: 0.65rem;">Avg Agent Latency</span>
+                  <div class="dial-value" id="val-obs-latency" style="font-size: 1.25rem; margin-top: 4px;">1.84s</div>
+                  <span style="font-size: 0.6rem; color: var(--text-muted);">planning & tools</span>
+                </div>
+                <div class="dial-card" style="border-top: 3px solid var(--accent-secondary);">
+                  <span class="dial-label" style="font-size: 0.65rem;">Knowledge Hub Hits</span>
+                  <div class="dial-value" id="val-obs-knowledge" style="font-size: 1.25rem; margin-top: 4px;">89.5%</div>
+                  <span style="font-size: 0.6rem; color: var(--text-muted);">vector RAG grounding</span>
+                </div>
+                <div class="dial-card" style="border-top: 3px solid var(--accent-warning);">
+                  <span class="dial-label" style="font-size: 0.65rem;">Tool Uptime</span>
+                  <div class="dial-value" id="val-obs-tools" style="font-size: 1.25rem; margin-top: 4px;">99.98%</div>
+                  <span style="font-size: 0.6rem; color: var(--text-muted);">42 MCP endpoints</span>
+                </div>
+              </div>
+
+              <!-- Integration Distribution -->
+              <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                <span><strong>Active Models:</strong> Gemini 1.5 Pro (35%), Gemini 1.5 Flash (55%), Gemma 2 (10%)</span>
+                <span><strong>Gateway Integrations:</strong> BigQuery, Google Search, Corp LDAP, Slack Outbox</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PERSONA 2: RISK CONSOLE -->
+          <div class="persona-panel" id="panel-risk">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                  </svg>
+                  Active Corporate Compliance Guardrails
+                </h3>
+                <span class="badge badge-success">Model Armor Shielding</span>
+              </div>
+              <div class="policy-list">
+                <!-- Policy 1 -->
+                <div class="policy-item">
+                  <div class="policy-info">
+                    <span class="policy-name">Prompt Injection & Jailbreak Shield</span>
+                    <span class="policy-desc">TCS Model Armor checks for adversarial instructions before model routing.</span>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="policy-injection" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <!-- Policy 2 -->
+                <div class="policy-item">
+                  <div class="policy-info">
+                    <span class="policy-name">PII Sanitization & Masking</span>
+                    <span class="policy-desc">Masks social security numbers, API keys, and phone numbers in inputs/outputs.</span>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="policy-pii" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <!-- Policy 3 -->
+                <div class="policy-item">
+                  <div class="policy-info">
+                    <span class="policy-name">Restrict External LLMs</span>
+                    <span class="policy-desc">Blocks execution of unregistered non-enterprise endpoints (e.g. ChatGPT, Claude).</span>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="policy-external-models" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <!-- Policy 4 -->
+                <div class="policy-item">
+                  <div class="policy-info">
+                    <span class="policy-name">GDPR Audit Ingestion</span>
+                    <span class="policy-desc">Forwards transaction hashes automatically to compliance auditor logs.</span>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="policy-gdpr" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PERSONA 3: COST TRACING & MONITORING -->
+          <div class="persona-panel" id="panel-cost">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  TCS Advanced Cost & Token Analytics
+                </h3>
+                <span class="badge badge-warning">Maximum Cost Tracing</span>
+              </div>
+              
+              <!-- Metric dials -->
+              <div class="cost-grid-dials">
+                <div class="dial-card" style="border-left: 4px solid var(--accent-primary);">
+                  <span class="dial-label">Total Spend (Today)</span>
+                  <div class="dial-value" id="val-cost-total">$142.84</div>
+                </div>
+                <div class="dial-card" style="border-left: 4px solid var(--accent-success);">
+                  <span class="dial-label">Cached Savings (Gemini Caching)</span>
+                  <div class="dial-value" id="val-cost-savings">$41.80</div>
+                </div>
+                <div class="dial-card" style="border-left: 4px solid var(--accent-warning);">
+                  <span class="dial-label">Tool Execution Fees</span>
+                  <div class="dial-value" id="val-cost-tools">$14.20</div>
+                </div>
+                <div class="dial-card" style="border-left: 4px solid var(--accent-secondary);">
+                  <span class="dial-label">Base API Overhead</span>
+                  <div class="dial-value" id="val-cost-base">$86.84</div>
+                </div>
+              </div>
+              
+              <div class="chart-container" style="margin-top: 15px;">
+                <canvas id="finopsCostChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- PERSONA 4: PLATFORM OPS CONTROL -->
+          <div class="persona-panel" id="panel-platform">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                  </svg>
+                  Platform Administration & Gateway Engine Health
+                </h3>
+                <span class="badge badge-danger">Real-time Interception</span>
+              </div>
+              
+              <div class="ops-system-health">
+                <div class="health-module">
+                  <span class="stat-label" style="font-size: 0.65rem;">Gateway Ingress</span>
+                  <span class="health-val text-success" style="color: var(--accent-success);">99.98%</span>
+                </div>
+                <div class="health-module">
+                  <span class="stat-label" style="font-size: 0.65rem;">Model Armor Latency</span>
+                  <span class="health-val" style="color: var(--accent-secondary);">0.85 ms</span>
+                </div>
+                <div class="health-module">
+                  <span class="stat-label" style="font-size: 0.65rem;">Active Memory Banks</span>
+                  <span class="health-val">42 Slots</span>
+                </div>
+                <div class="health-module">
+                  <span class="stat-label" style="font-size: 0.65rem;">CPU / Load</span>
+                  <span class="health-val">12.4%</span>
+                </div>
+              </div>
+              
+              <!-- Intervention Hub -->
+              <div style="margin-top: 10px;">
+                <h4 style="margin-bottom: 8px; font-size: 0.95rem;">Active Execution Intervention Hub</h4>
+                <div style="overflow-x: auto;">
+                  <table class="runtime-workload-table">
+                    <thead>
+                      <tr>
+                        <th>Tenant</th>
+                        <th>Agent Name</th>
+                        <th>Status</th>
+                        <th>Model</th>
+                        <th>Tokens/Sec</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="intervention-table-body">
+                      <!-- Populated dynamically via JS -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+
+        <!-- Right Side: Unified Outputs (One Truth) -->
+        <div class="column-right">
+          
+          <!-- DYNAMIC DETAILS (DEVELOPER CODE / COMPLIANCE RATING / SAVINGS ALERTS) -->
+          <div id="dynamic-detail-panel">
+            <!-- Rendered dynamically by JS depending on active persona -->
+          </div>
+
+          <!-- SecOps Log -->
+          <div class="card secops-log-card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                TCS Gateway Audit Log (SecOps Log)
+              </h3>
+              <button class="btn-secondary" id="btn-clear-logs" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 6px;">Clear</button>
+            </div>
+            <div class="log-stream" id="log-stream-container">
+              <!-- Logs appended here dynamically -->
+            </div>
+          </div>
+          
+          <!-- Cryptographic Tamper-Evident Ledger -->
+          <div class="ledger-verification-box">
+            <div class="ledger-info">
+              <span class="stat-label">Tamper-Evident Ledger</span>
+              <span class="ledger-hash" id="ledger-root-hash">Root Block: Initializing SHA-256...</span>
+            </div>
+            <button class="btn-primary" id="btn-verify-ledger" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 8px;">
+              Verify Ledger
+            </button>
+          </div>
+          
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
