@@ -1226,3 +1226,86 @@ input:checked + .slider:before {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Light Theme Variables & Component Overrides */
+body.light-theme {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.8);
+  --bg-card-hover: rgba(255, 255, 255, 0.95);
+  --border-color: rgba(15, 23, 42, 0.08);
+  --border-glow: rgba(99, 102, 241, 0.08);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --card-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+body.light-theme header {
+  background: rgba(248, 250, 252, 0.8);
+}
+
+body.light-theme .lanes-container {
+  background: rgba(15, 23, 42, 0.02);
+  border-color: rgba(15, 23, 42, 0.04);
+}
+
+body.light-theme .lane {
+  background: rgba(15, 23, 42, 0.01);
+}
+
+body.light-theme .lane-axis {
+  background: rgba(15, 23, 42, 0.06);
+}
+
+body.light-theme .secops-log-card {
+  background: rgba(15, 23, 42, 0.02) !important;
+}
+
+body.light-theme .log-stream {
+  background: rgba(15, 23, 42, 0.01);
+  border-color: rgba(15, 23, 42, 0.05);
+}
+
+body.light-theme .log-entry {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(15, 23, 42, 0.03);
+}
+
+body.light-theme .dial-card {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+body.light-theme .table-container, 
+body.light-theme table tr {
+  border-bottom-color: rgba(15, 23, 42, 0.05);
+}
+
+body.light-theme input[type="text"], 
+body.light-theme select, 
+body.light-theme textarea {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(15, 23, 42, 0.1);
+  color: #0f172a;
+}
+
+body.light-theme .badge-info { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
+body.light-theme .badge-success { background: rgba(16, 185, 129, 0.1); color: #059669; }
+body.light-theme .badge-warning { background: rgba(245, 158, 11, 0.1); color: #d97706; }
+body.light-theme .badge-danger { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
+
+body.light-theme .timeline-step .step-node-dot {
+  background: #e2e8f0;
+}
+
+body.light-theme .timeline-step.active .step-node-dot {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+body.light-theme .timeline-step.passed .step-node-dot {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+body.light-theme .timeline-step.failed .step-node-dot {
+  background: rgba(239, 68, 68, 0.1);
+}
