@@ -422,6 +422,11 @@ function updateStatsUI() {
     const hitRate = 88.5 + (Math.sin(Date.now() / 18000) * 1.5) + (Math.random() * 0.3);
     knowledgeVal.innerText = `${hitRate.toFixed(1)}%`;
   }
+
+  // Live update OTel Metrics Explorer if active
+  if (state.activePersona === 'lifecycle') {
+    loadOtelMetrics();
+  }
 }
 
 // Switch between User Personas
@@ -452,7 +457,10 @@ function switchPersona(persona) {
 
   // Load trace steps when Lifecycle becomes visible
   if (persona === 'lifecycle') {
-    setTimeout(loadLifecycleAgent, 50);
+    setTimeout(() => {
+      loadLifecycleAgent();
+      loadOtelMetrics();
+    }, 50);
   }
 }
 window.switchPersona = switchPersona;
@@ -1163,9 +1171,105 @@ function toggleRunawaySim() {
   }
 }
 
+// --- OpenTelemetry 56 Metrics Schema (Google ADK Observability Standard) ---
+const otelMetricsSchema = {
+  agent: [
+    { name: 'Agent Invocation Latency', id: 'gen_ai.agent.invocation.duration', type: 'Histogram', unit: 'ms', valFn: () => (1400 + Math.random() * 800).toFixed(0) },
+    { name: 'Request Payload Size', id: 'gen_ai.agent.request.size', type: 'Histogram', unit: 'Bytes', valFn: () => (400 + Math.random() * 200).toFixed(0) },
+    { name: 'Response Payload Size', id: 'gen_ai.agent.response.size', type: 'Histogram', unit: 'Bytes', valFn: () => (800 + Math.random() * 400).toFixed(0) },
+    { name: 'Workflow Execution Steps', id: 'gen_ai.agent.workflow.steps', type: 'Histogram', unit: 'Count', valFn: () => (3 + Math.floor(Math.random() * 4)) },
+    { name: 'Total Invocations', id: 'gen_ai.agent.calls.count', type: 'Counter', unit: 'Count', valFn: () => state.ledger.length + 950 },
+    { name: 'Agent Execution Errors', id: 'gen_ai.agent.errors.count', type: 'Counter', unit: 'Count', valFn: () => state.stats.violations },
+    { name: 'Prompt Token Usage', id: 'gen_ai.agent.token.prompt', type: 'Counter', unit: 'Tokens', valFn: () => Math.round(state.stats.baseFees * 200000) },
+    { name: 'Completion Token Usage', id: 'gen_ai.agent.token.completion', type: 'Counter', unit: 'Tokens', valFn: () => Math.round((state.stats.totalSpend - state.stats.baseFees) * 150000) },
+    { name: 'Total Token Usage', id: 'gen_ai.agent.token.total', type: 'Counter', unit: 'Tokens', valFn: () => Math.round(state.stats.totalSpend * 180000) },
+    { name: 'Estimated Cost', id: 'gen_ai.agent.cost', type: 'Histogram', unit: 'USD ($)', valFn: () => `$${(0.001 + Math.random() * 0.005).toFixed(5)}` },
+    { name: 'Retry Attempts', id: 'gen_ai.agent.retry.count', type: 'Counter', unit: 'Count', valFn: () => Math.round(state.ledger.length * 0.05) },
+    { name: 'Agent Latency Overhead', id: 'gen_ai.agent.latency.overhead', type: 'Histogram', unit: 'ms', valFn: () => (state.stats.latency + Math.random() * 0.1).toFixed(2) },
+    { name: 'Handoff Count', id: 'gen_ai.agent.handoff.count', type: 'Counter', unit: 'Count', valFn: () => Math.round(state.ledger.length * 0.12) },
+    { name: 'Reasoning Drift Score', id: 'gen_ai.agent.reasoning.drift', type: 'Histogram', unit: 'Score', valFn: () => (0.02 + Math.random() * 0.03).toFixed(3) },
+    { name: 'RCA Search Depth', id: 'gen_ai.agent.root_cause.depth', type: 'Histogram', unit: 'Nodes', valFn: () => 5 },
+    { name: 'RCA Confidence Score', id: 'gen_ai.agent.root_cause.confidence', type: 'Histogram', unit: '%', valFn: () => (92.5 + Math.random() * 4).toFixed(1) },
+    { name: 'Memory Read Operations', id: 'gen_ai.agent.memory.reads', type: 'Counter', unit: 'Count', valFn: () => state.ledger.length * 2 },
+    { name: 'Memory Write Operations', id: 'gen_ai.agent.memory.writes', type: 'Counter', unit: 'Count', valFn: () => state.ledger.length },
+    { name: 'User Feedback Score', id: 'gen_ai.agent.feedback.count', type: 'Counter', unit: 'Count', valFn: () => Math.round(state.ledger.length * 0.4) },
+    { name: 'Fallback Triggers', id: 'gen_ai.agent.fallback.triggered', type: 'Counter', unit: 'Count', valFn: () => Math.round(state.stats.violations * 0.8) }
+  ],
+  tool: [
+    { name: 'Tool Execution Duration', id: 'gen_ai.tool.execution.duration', type: 'Histogram', unit: 'ms', valFn: () => (80 + Math.random() * 120).toFixed(0) },
+    { name: 'Tool Calls Count', id: 'gen_ai.tool.calls.count', type: 'Counter', unit: 'Count', valFn: () => Math.round(state.ledger.length * 1.5) },
+    { name: 'Tool Failures Count', id: 'gen_ai.tool.errors.count', type: 'Counter', unit: 'Count', valFn: () => Math.round(state.stats.violations * 0.1) },
+    { name: 'Tool Cache Hits', id: 'gen_ai.tool.cache.hit', type: 'Counter', unit: 'Count', valFn: () => Math.round(state.ledger.length * 0.8) },
+    { name: 'Tool Cache Misses', id: 'gen_ai.tool.cache.miss', type: 'Counter', unit: 'Count', valFn: () => Math.round(state.ledger.length * 0.7) },
+    { name: 'Tool Payload Size', id: 'gen_ai.tool.payload.size', type: 'Histogram', unit: 'Bytes', valFn: () => (1200 + Math.random() * 800).toFixed(0) },
+    { name: 'Tool Concurrency', id: 'gen_ai.tool.concurrency', type: 'UpDownCounter', unit: 'Count', valFn: () => (1 + Math.floor(Math.random() * 3)) },
+    { name: 'Tool Timeout Count', id: 'gen_ai.tool.timeout.count', type: 'Counter', unit: 'Count', valFn: () => 0 }
+  ],
+  workflow: [
+    { name: 'Session Duration', id: 'gen_ai.workflow.duration', type: 'Histogram', unit: 'ms', valFn: () => (125000 + Math.random() * 45000).toFixed(0) },
+    { name: 'Active Agents Count', id: 'gen_ai.workflow.active_agents', type: 'UpDownCounter', unit: 'Count', valFn: () => 3 },
+    { name: 'Session Memory Footprint', id: 'gen_ai.workflow.memory.usage', type: 'Histogram', unit: 'Chars', valFn: () => (4200 + Math.random() * 1200).toFixed(0) },
+    { name: 'Active Context Tokens', id: 'gen_ai.workflow.tokens.active', type: 'Histogram', unit: 'Tokens', valFn: () => (8400 + Math.random() * 2400).toFixed(0) },
+    { name: 'Conversational Turns', id: 'gen_ai.workflow.turns.count', type: 'Counter', unit: 'Turns', valFn: () => state.ledger.length * 4 },
+    { name: 'Workflow Run Successes', id: 'gen_ai.workflow.success.count', type: 'Counter', unit: 'Runs', valFn: () => state.ledger.length },
+    { name: 'Workflow Run Errors', id: 'gen_ai.workflow.errors.count', type: 'Counter', unit: 'Runs', valFn: () => state.stats.violations },
+    { name: 'Workflow Queue Delay', id: 'gen_ai.workflow.queue.delay', type: 'Histogram', unit: 'ms', valFn: () => (12 + Math.random() * 28).toFixed(1) },
+    { name: 'Handoff Chain Depth', id: 'gen_ai.workflow.handoff.depth', type: 'Histogram', unit: 'Depth', valFn: () => 4 },
+    { name: 'Concurrency Limit', id: 'gen_ai.workflow.concurrency.limit', type: 'Histogram', unit: 'Slots', valFn: () => 64 }
+  ],
+  model: [
+    { name: 'Model Response Latency', id: 'gen_ai.model.response.latency', type: 'Histogram', unit: 'ms', valFn: () => (800 + Math.random() * 400).toFixed(0) },
+    { name: 'Stream Chunk Count', id: 'gen_ai.model.stream.chunk.count', type: 'Counter', unit: 'Count', valFn: () => Math.round(state.ledger.length * 24) },
+    { name: 'Stream Chunk Delay', id: 'gen_ai.model.stream.chunk.latency', type: 'Histogram', unit: 'ms', valFn: () => (14 + Math.random() * 8).toFixed(1) },
+    { name: 'Model Temperature', id: 'gen_ai.model.temperature', type: 'Histogram', unit: 'Value', valFn: () => 0.7 },
+    { name: 'Model Top-P', id: 'gen_ai.model.top_p', type: 'Histogram', unit: 'Value', valFn: () => 0.95 },
+    { name: 'Model Top-K', id: 'gen_ai.model.top_k', type: 'Histogram', unit: 'Value', valFn: () => 40 }
+  ],
+  system: [
+    { name: 'Host CPU Utilization', id: 'gen_ai.system.cpu.utilization', type: 'Histogram', unit: '%', valFn: () => (22.5 + Math.random() * 4.5).toFixed(1) },
+    { name: 'Host Memory Utilization', id: 'gen_ai.system.memory.utilization', type: 'Histogram', unit: '%', valFn: () => (46.8 + Math.random() * 1.2).toFixed(1) },
+    { name: 'Disk Space Utilization', id: 'gen_ai.system.disk.utilization', type: 'Histogram', unit: '%', valFn: () => '14.2' },
+    { name: 'Network Bytes Received', id: 'gen_ai.system.network.bytes.in', type: 'Counter', unit: 'Bytes', valFn: () => Math.round(state.ledger.length * 1500) },
+    { name: 'Network Bytes Transmitted', id: 'gen_ai.system.network.bytes.out', type: 'Counter', unit: 'Bytes', valFn: () => Math.round(state.ledger.length * 2800) },
+    { name: 'Active Socket Connections', id: 'gen_ai.system.active.connections', type: 'UpDownCounter', unit: 'Count', valFn: () => (8 + Math.floor(Math.random() * 4)) }
+  ],
+  security: [
+    { name: 'Cloud Armor Blocked Requests', id: 'gen_ai.security.cloud_armor.blocked', type: 'Counter', unit: 'Count', valFn: () => Math.round(state.stats.violations * 0.1) },
+    { name: 'Cloud Armor Violations', id: 'gen_ai.security.cloud_armor.violations', type: 'Counter', unit: 'Count', valFn: () => 0 },
+    { name: 'Model Armor Injection Blocks', id: 'gen_ai.security.model_armor.prompt_injection', type: 'Counter', unit: 'Count', valFn: () => Math.round(state.stats.violations * 0.4) },
+    { name: 'Model Armor Jailbreak Blocks', id: 'gen_ai.security.model_armor.jailbreak', type: 'Counter', unit: 'Count', valFn: () => Math.round(state.stats.violations * 0.3) },
+    { name: 'Model Armor PII Leak Blocks', id: 'gen_ai.security.model_armor.pii_leak', type: 'Counter', unit: 'Count', valFn: () => Math.round(state.stats.violations * 0.3) },
+    { name: 'Model Armor Safety Triggers', id: 'gen_ai.security.model_armor.safety_triggers', type: 'Counter', unit: 'Count', valFn: () => 0 }
+  ]
+};
+
+function loadOtelMetrics() {
+  const select = document.getElementById('otel-category-select');
+  if (!select) return;
+  const category = select.value;
+  const metrics = otelMetricsSchema[category];
+  const tbody = document.getElementById('otel-metrics-tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = '';
+  metrics.forEach(m => {
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid rgba(255,255,255,0.03)';
+    tr.innerHTML = `
+      <td style="padding: 6px 10px; font-weight: 600; color: var(--text-primary);">${m.name}</td>
+      <td style="padding: 6px 10px; font-family: var(--font-mono); color: var(--text-secondary);">${m.id}</td>
+      <td style="padding: 6px 10px;"><span class="badge badge-info" style="font-size: 0.65rem;">${m.type}</span></td>
+      <td style="padding: 6px 10px; color: var(--text-muted);">${m.unit}</td>
+      <td style="padding: 6px 10px; font-family: var(--font-mono); text-align: right; color: var(--accent-secondary); font-weight: bold;">${m.valFn()}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
 window.loadLifecycleAgent = loadLifecycleAgent;
 window.triggerLifecycleTrace = triggerLifecycleTrace;
 window.toggleRunawaySim = toggleRunawaySim;
+window.loadOtelMetrics = loadOtelMetrics;
 
 // --- Initialization On DOM Load ---
 document.addEventListener('DOMContentLoaded', () => {

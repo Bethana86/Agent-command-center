@@ -268,6 +268,49 @@
                 <span><strong>Gateway Integrations:</strong> BigQuery, Google Search, Corp LDAP, Slack Outbox</span>
               </div>
             </div>
+
+            <!-- New Section: OTel 56 Metrics Explorer -->
+            <div class="card" style="margin-top: 16px;">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
+                  </svg>
+                  TCS OTel Metrics Explorer (56 Standard Signals)
+                </h3>
+                <span class="badge badge-info">gcp.vertex.agent</span>
+              </div>
+              <div class="sandbox-editor" style="gap: 12px; padding: 0;">
+                <div class="editor-field" style="margin-bottom: 12px;">
+                  <label class="editor-label">Select OpenTelemetry Signal Category</label>
+                  <select id="otel-category-select" onchange="loadOtelMetrics()">
+                    <option value="agent" selected>Agent Performance (20 Metrics)</option>
+                    <option value="tool">Tool Diagnostics (8 Metrics)</option>
+                    <option value="workflow">Session & Workflow (10 Metrics)</option>
+                    <option value="model">Model Engine (6 Metrics)</option>
+                    <option value="system">System Resources (6 Metrics)</option>
+                    <option value="security">Policy & Governance (6 Metrics)</option>
+                  </select>
+                </div>
+                
+                <div style="max-height: 240px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(0,0,0,0.15);">
+                  <table style="width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: left;" id="otel-metrics-table">
+                    <thead>
+                      <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); color: var(--text-muted);">
+                        <th style="padding: 8px 10px;">Metric Name</th>
+                        <th style="padding: 8px 10px;">OTel Signal ID</th>
+                        <th style="padding: 8px 10px;">Type</th>
+                        <th style="padding: 8px 10px;">Unit</th>
+                        <th style="padding: 8px 10px; text-align: right;">Live Value</th>
+                      </tr>
+                    </thead>
+                    <tbody id="otel-metrics-tbody">
+                      <!-- Dynamically populated via JS -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- PERSONA 2: RISK CONSOLE -->
